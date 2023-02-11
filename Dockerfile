@@ -2,18 +2,25 @@ FROM centos
 
 MAINTAINER Nxy <yihao342@163.com>
 
-ADD sources.list /etc/apt/sources.list
+
+# ADD sources.list /etc/apt/sources.list
 COPY config/* /tmp/
 
 WORKDIR /root
 
+# RUN sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+#          -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos|g' \
+#          -i.bak \
+#          /etc/yum.repos.d/CentOS-*.repo
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 # install openssh-server, openjdk and wget,install hadoop 3.2.2 vim
-RUN yum -y update && yum install -y openssh-server java-1.8.0-openjdk.x86_64 wget vim lrzsz java-1.8.0-openjdk-devel openssh-clients
+RUN yum clean all && yum makecache && yum -y update && yum install -y openssh-server java-1.8.0-openjdk.x86_64 wget vim lrzsz java-1.8.0-openjdk-devel openssh-clients
 
-RUN wget https://mirrors.bfsu.edu.cn/apache/hadoop/common/hadoop-3.2.2/hadoop-3.2.2.tar.gz && \
-    tar -xzvf hadoop-3.2.2.tar.gz && \
-    mv hadoop-3.2.2 /usr/local/hadoop && \
-    rm hadoop-3.2.2.tar.gz
+RUN wget https://mirrors.bfsu.edu.cn/apache/hadoop/common/hadoop-3.2.4/hadoop-3.2.4.tar.gz && \
+    tar -xzvf hadoop-3.2.4.tar.gz && \
+    mv hadoop-3.2.4 /usr/local/hadoop && \
+    rm hadoop-3.2.4.tar.gz
 
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/apache/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz && \
     tar -xzvf apache-hive-3.1.2-bin.tar.gz && \
